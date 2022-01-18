@@ -15,11 +15,10 @@ Red Hat deprecated legacy `pam_krb5.so` Kerberos (and legacy `pam_ldap.so` LDAP)
 
 The problem is that many legacy mechanisms and architectures don't support REALM (domain) context in authentication, and will choke on it.  Configuring SSSD with multiple providers for multiple systems can cause issues too, as user1 in one context is not the same as user 1 in another context, even if their passwords are the same.  This is ideal and best practice from a security standpoint but, again, legacy mechanisms and architectures don't mesh well, especially where the architecture is Windows-centric, and no proper non-Windows, POSIX (UNIX/Linux) architecture is done for Identity and RBAC.  Hence an option to build such a module, one that has **no dependencies** on PAM or other support packages (other tha MIT Kerberos libraries).
 
-Build, install and modify `/etc/pam.d/[password|system]-auth` as appropriate.
 
 ### Example
 
-To preempt SSSD (`pam_sss.so`) -- which always requires a REALM (Domain) context -- so Kerberos authentication can occur using a default/assumed REALM (Domain) or equivalent, with `pam_krb5.so`.  Again, this is a legacy approach which may have security implications in the case people have root on system, VM or Container instances.
+Preempt SSSD (`pam_sss.so`) -- which always requires a REALM (Domain) context -- so Kerberos authentication can occur using a default/assumed REALM (Domain) or equivalent, with `pam_krb5.so` in `/etc/pam.d/[password|system]-auth` or other files as appropriate.
 
 ```
   ... 
@@ -29,5 +28,9 @@ auth        sufficient                       pam_sss.so use_first_pass
   ... 
 ```
 
-Consider yourself, and your Enterprise, warned for not architecting your enterprise correctly for non-Windows, POSIX (UNIX/Linux) enterprise with appropriate REALM (Domain) contexts if you have to use something leagacy like this.
+Again, this is a legacy approach which may have security implications in the case people have root on system, VM or Container instances.
+
+> **WARNING:**  Consider yourself, and your Enterprise, warned for **not properly architecting your enterprise** for non-Windows, POSIX (UNIX/Linux) enterprise with appropriate REALM (Domain) contexts if you have to use something leagacy like this.
+
+> **TIP:**  We know a lot of Windows-centric shops don't understand anything but Windows, and why doesn't Linux use Microsoft stuff (when it's Microsoft that ignored existing Internet standards and created something Windows-only later), but please enlightent them to something like IPA, especially ID Mapping, or storing POSIX attributes in AD instead of having a hack of different REALM (Domain) equivalents that requires something like this for Kerberos authentication.
 
